@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class OnTrig : MonoBehaviour
 {
+    AudioClip clip;
+    AudioSource ac;
     // Start is called before the first frame update
-    void Start()
+    void OnTriggerEnter(Collider other)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //ac.Play(clip);
     }
 }
