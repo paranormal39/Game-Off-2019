@@ -57,9 +57,12 @@ public class RigidbodyController : MonoBehaviour
         float moveHor = Input.GetAxis("Horizontal");
         float moveVer = Input.GetAxis("Vertical");
 
-        Vector3 movement = new Vector3(moveHor, 0.0f, moveVer) * speed * Time.deltaTime;
+        Vector3 movement = new Vector3(0, 0, moveVer) * speed * Time.deltaTime;
         timerotation = 1000f * Time.deltaTime;
+
+        /*
         Vector3 targetdir = movement;
+        
         targetdir.y = 0;
         if (targetdir == Vector3.zero)
         {
@@ -68,9 +71,10 @@ public class RigidbodyController : MonoBehaviour
             Quaternion targetRotation = Quaternion.Slerp(transform.rotation, tr, 0f);
             transform.rotation = targetRotation;
         }
-
+        */
         //rigidbody.velocity = movement *speed;
         //rigidbody.AddForce(movement * thrust
+        transform.Rotate(0f, moveHor, 0f);
         transform.Translate(movement, Space.Self);
 
     }
