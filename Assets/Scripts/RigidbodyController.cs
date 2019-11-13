@@ -17,6 +17,9 @@ public class RigidbodyController : MonoBehaviour
     public float timerotation;
 
     private Animator anim;
+    public bool isAiming;
+
+    public GameObject turnoff;
     // Start is called before the first frame update
     void Start()
     {
@@ -112,6 +115,19 @@ public class RigidbodyController : MonoBehaviour
             jump();
             anim.Play("Jump");
         }
+
+        if (Input.GetButtonDown("Fire2"))
+        {
+            shoot();
+            anim.Play("shoot2");
+           
+        }
+
+        if (Input.GetButtonUp("Fire2"))
+        {
+            anim.SetBool("isAim", false);
+           
+        }
     }
     void jump() {
         airpressure -= .009f;
@@ -131,5 +147,10 @@ public class RigidbodyController : MonoBehaviour
         yield return new WaitForSeconds(2f);
         airpressure += .3f;
 
+    }
+
+    private void shoot()
+    {
+        anim.SetBool("isAim", true);
     }
 }
