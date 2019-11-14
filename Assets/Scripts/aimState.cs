@@ -22,7 +22,7 @@ public class aimState : MonoBehaviour
         float vertx = Input.GetAxis("Mouse X");
         float horz = Input.GetAxis("Mouse Y");
 
-        Vector3 look = new Vector3(vertx, horz, 0)*Time.deltaTime;
+        Vector3 look = new Vector3(vertx, horz, 0);
 
         transform.Rotate(look);
 
