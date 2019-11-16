@@ -20,6 +20,12 @@ public class RigidbodyController : MonoBehaviour
     public bool isAiming;
 
     public GameObject turnoff;
+
+    public bool grounded;
+    public float groundcheckrange;
+
+    public float velocity;
+    public float motion;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +33,7 @@ public class RigidbodyController : MonoBehaviour
         airpressure = 1f;
         canJump = true;
         anim = GetComponent<Animator>();
+        groundcheckrange = 1f;
         //Cursor.visble = false;
         //Cursor.lockstate = true;
     }
@@ -36,8 +43,11 @@ public class RigidbodyController : MonoBehaviour
     {
         slider.value = airpressure;
         Timer -= Time.deltaTime;
-
-        if(airpressure <= .01f && canJump ==true )
+        velocity = rigidbody.velocity.y;
+        motion = Input.GetAxis("Vertical");
+        anim.SetFloat("motion", motion);
+        anim.SetFloat("velocity", velocity);
+        if (airpressure <= .01f && canJump ==true )
         {
             StartCoroutine(refill());
             canJump = false;
@@ -62,6 +72,21 @@ public class RigidbodyController : MonoBehaviour
 
         Vector3 movement = new Vector3(0, 0, moveVer) * speed * Time.deltaTime;
         timerotation = 1000f * Time.deltaTime;
+
+        Vector3 down = new Vector3(0, -1);
+
+        RaycastHit ground;
+        if (Physics.Raycast(transform.position, down, out ground, groundcheckrange))
+        {
+            grounded = true;
+
+        } 
+        else {
+
+            grounded = false;
+        }
+
+        
 
         /*
         Vector3 targetdir = movement;
@@ -107,13 +132,13 @@ public class RigidbodyController : MonoBehaviour
     */
         if(moveVer >= 0.1f)
         {
-            anim.Play("Walk");
+           // anim.Play("Walk");
         }
 
-        if (Input.GetKey(KeyCode.Space) && canJump == true)
+        if (Input.GetKey(KeyCode.Space) && grounded == true)
         {
             jump();
-            anim.Play("Jump");
+          
         }
 
         if (Input.GetButtonDown("Fire2"))
@@ -152,5 +177,7 @@ public class RigidbodyController : MonoBehaviour
     private void shoot()
     {
         anim.SetBool("isAim", true);
-    }
+    } 
+
+   
 }
