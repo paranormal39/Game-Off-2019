@@ -26,6 +26,10 @@ public class RigidbodyController : MonoBehaviour
 
     public float velocity;
     public float motion;
+
+    public AudioClip[] folley;
+    public AudioClip footstep;
+    public AudioSource ac;
     // Start is called before the first frame update
     void Start()
     {
@@ -132,7 +136,14 @@ public class RigidbodyController : MonoBehaviour
     */
         if(moveVer >= 0.1f)
         {
-           // anim.Play("Walk");
+            // play audio foot steps 
+            int index = Random.Range(0, folley.Length);
+            footstep = folley[index];
+            ac.clip = footstep;
+            ac.Play();
+
+            
+
         }
 
         if (Input.GetKey(KeyCode.Space) && grounded == true)
