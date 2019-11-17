@@ -7,10 +7,11 @@ public class RigidbodyController : MonoBehaviour
 {
     Rigidbody rigidbody;
     public float speed;
+    [SerializeField] private float rotatespeed;
     public float thrust;
     public float jumpmag;
     public float airpressure;
-    public Slider slider;
+    //public Slider slider;
     private float Timer = 3f;
     public bool canJump;
 
@@ -26,6 +27,7 @@ public class RigidbodyController : MonoBehaviour
 
     public float velocity;
     public float motion;
+    public float horzmotion;
 
     public AudioClip[] folley;
     public AudioClip footstep;
@@ -45,18 +47,20 @@ public class RigidbodyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        slider.value = airpressure;
+       // slider.value = airpressure;
         Timer -= Time.deltaTime;
         velocity = rigidbody.velocity.y;
         motion = Input.GetAxis("Vertical");
+        horzmotion = Input.GetAxis("Horizontal");
         anim.SetFloat("motion", motion);
         anim.SetFloat("velocity", velocity);
-        if (airpressure <= .01f && canJump ==true )
+        anim.SetFloat("horzmotion", horzmotion);
+        if (airpressure <= .01f && canJump == true)
         {
             StartCoroutine(refill());
             canJump = false;
 
-        }else if( airpressure >= 1f)
+        } else if (airpressure >= 1f)
         {
             airpressure = 1f;
             StopCoroutine(refill());
@@ -64,7 +68,7 @@ public class RigidbodyController : MonoBehaviour
             canJump = true;
         }
 
-        if(Timer <= .01f)
+        if (Timer <= .01f)
         {
             StartCoroutine(adjustrefill());
             Timer = 5f;
@@ -75,7 +79,7 @@ public class RigidbodyController : MonoBehaviour
         float moveVer = Input.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(0, 0, moveVer) * speed * Time.deltaTime;
-        timerotation = 1000f * Time.deltaTime;
+
 
         Vector3 down = new Vector3(0, -1);
 
@@ -84,13 +88,11 @@ public class RigidbodyController : MonoBehaviour
         {
             grounded = true;
 
-        } 
+        }
         else {
 
             grounded = false;
         }
-
-        
 
         /*
         Vector3 targetdir = movement;
@@ -106,16 +108,23 @@ public class RigidbodyController : MonoBehaviour
         */
         //rigidbody.velocity = movement *speed;
         //rigidbody.AddForce(movement * thrust
-        transform.Rotate(0f, moveHor, 0f);
+        //transform.Rotate(0f, moveHor, 0f);
         transform.Translate(movement, Space.Self);
 
     }
 
     void FixedUpdate()
     {
-        
+
         float moveHor = Input.GetAxis("Horizontal");
         float moveVer = Input.GetAxis("Vertical");
+
+        float lookHor = Input.GetAxis("Mouse X");
+        float lookVer = Input.GetAxis("Mouse Y");
+
+        Vector2 screenlook = new Vector2(0, lookHor) * speed;
+
+        transform.Rotate(screenlook);
         /*
         Vector3 movement = new Vector3(moveHor, 0.0f, moveVer) * speed * Time.deltaTime;
         timerotation = 1000f * Time.deltaTime ;
@@ -134,48 +143,53 @@ public class RigidbodyController : MonoBehaviour
         transform.Translate(movement, Space.Self);
 
     */
-        if(moveVer >= 0.1f)
+        if (moveVer >= 0.1f)
         {
             // play audio foot steps 
-            int index = Random.Range(0, folley.Length);
-            footstep = folley[index];
-            ac.clip = footstep;
-            ac.Play();
+            if (!ac.isPlaying)
+            {
+                StartCoroutine(foleysfx());
+            }
+            else
+            {
+                //ac.Stop();
+               StopCoroutine(foleysfx());
+            }
 
-            
+
 
         }
 
         if (Input.GetKey(KeyCode.Space) && grounded == true)
         {
             jump();
-          
+
         }
 
         if (Input.GetButtonDown("Fire2"))
         {
             shoot();
             anim.Play("shoot2");
-           
+
         }
 
         if (Input.GetButtonUp("Fire2"))
         {
             anim.SetBool("isAim", false);
-           
+
         }
     }
     void jump() {
         airpressure -= .009f;
         Vector3 jumpforce = new Vector3(0, jumpmag, 0) * speed;
         rigidbody.AddForce(jumpforce);
-            }
+    }
 
     private IEnumerator refill()
     {
         yield return new WaitForSeconds(2f);
-        airpressure+= .1f;
-       
+        airpressure += .1f;
+
     }
 
     private IEnumerator adjustrefill()
@@ -188,7 +202,19 @@ public class RigidbodyController : MonoBehaviour
     private void shoot()
     {
         anim.SetBool("isAim", true);
-    } 
+    }
+
+    private IEnumerator foleysfx()
+    {
+        
+        int index = Random.Range(0, folley.Length);
+        footstep = folley[index];
+        ac.clip = footstep;
+        if(!ac.isPlaying)ac.Play();
+        yield return new WaitForSeconds(1.5f);
+
+        
+    }
 
    
 }
