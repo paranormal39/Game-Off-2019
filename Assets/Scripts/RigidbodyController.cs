@@ -32,6 +32,9 @@ public class RigidbodyController : MonoBehaviour
     public AudioClip[] folley;
     public AudioClip footstep;
     public AudioSource ac;
+
+    public int setHighPoint;
+    public bool passedHighPoint;
     // Start is called before the first frame update
     void Start()
     {
@@ -66,7 +69,9 @@ public class RigidbodyController : MonoBehaviour
             StopCoroutine(refill());
             StopCoroutine(adjustrefill());
             canJump = true;
-        }
+        } 
+
+        
 
         if (Timer <= .01f)
         {
@@ -82,16 +87,35 @@ public class RigidbodyController : MonoBehaviour
 
 
         Vector3 down = new Vector3(0, -1);
-
+        Vector3 highpoint = new Vector3(0, setHighPoint, 0);
         RaycastHit ground;
+        if(transform.position.y > highpoint.y)
+        {
+            passedHighPoint = true;
+            blownaway();
+        }
+        else
+        {
+            passedHighPoint = false;
+        }
         if (Physics.Raycast(transform.position, down, out ground, groundcheckrange))
         {
             grounded = true;
+            if (Input.GetKey(KeyCode.Space) && grounded == true)
+            {
+                jump();
+                
+            }
 
         }
         else {
 
-            grounded = false;
+            grounded = false; 
+
+            if(transform.position.y >highpoint.y)
+            {
+                passedHighPoint = true;
+            }
         }
 
         /*
@@ -123,6 +147,10 @@ public class RigidbodyController : MonoBehaviour
         float lookVer = Input.GetAxis("Mouse Y");
 
         Vector2 screenlook = new Vector2(0, lookHor) * speed;
+
+        
+
+        
 
         transform.Rotate(screenlook);
         /*
@@ -160,11 +188,7 @@ public class RigidbodyController : MonoBehaviour
 
         }
 
-        if (Input.GetKey(KeyCode.Space) && grounded == true)
-        {
-            jump();
-
-        }
+       
 
         if (Input.GetButtonDown("Fire2"))
         {
@@ -216,5 +240,9 @@ public class RigidbodyController : MonoBehaviour
         
     }
 
+    public void blownaway()
+    {
+        rigidbody.AddForce(0, 200, 0, ForceMode.Impulse);
+    }
    
 }
