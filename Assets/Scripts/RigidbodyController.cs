@@ -146,7 +146,7 @@ public class RigidbodyController : MonoBehaviour
         float lookHor = Input.GetAxis("Mouse X");
         float lookVer = Input.GetAxis("Mouse Y");
 
-        Vector2 screenlook = new Vector2(0, lookHor) * speed;
+        Vector2 screenlook = new Vector2(0, lookHor) * speed /2;
 
         
 

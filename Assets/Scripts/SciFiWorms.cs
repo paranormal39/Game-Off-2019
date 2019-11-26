@@ -30,7 +30,7 @@ public class SciFiWorms : MonoBehaviour
     }
     private void Awake()
     {
-        InvokeRepeating("moveto",0f,12f);
+        InvokeRepeating("moveto",0f,21f);
 
     }
 
@@ -42,7 +42,7 @@ public class SciFiWorms : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer <= 0.1f && isattacking == false)
         {
-            StartCoroutine(attack());
+           // StartCoroutine(attack());
         }
         else if (timer<= 0.1f && isattacking == true){
             timer += 7f;
