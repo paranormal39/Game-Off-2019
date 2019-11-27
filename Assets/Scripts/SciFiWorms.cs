@@ -30,7 +30,7 @@ public class SciFiWorms : MonoBehaviour
     }
     private void Awake()
     {
-        InvokeRepeating("moveto",0f,21f);
+        //InvokeRepeating("moveto",0f,21f);
 
     }
 

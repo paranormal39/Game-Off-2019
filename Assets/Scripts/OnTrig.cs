@@ -7,6 +7,7 @@ public class OnTrig : MonoBehaviour
    public AudioClip clip;
    public AudioSource ac;
     public GameObject gameObject;
+    private int index;
     // Start is called before the first frame update
 
     void OnStart()
@@ -15,8 +16,12 @@ public class OnTrig : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        ac.PlayOneShot(clip);
-        gameObject.SetActive(true);
-        
+
+        if (other.gameObject.tag == "Player" && index <= 0)
+        {
+            ac.PlayOneShot(clip);
+            gameObject.SetActive(true);
+            index++;
+        }
     }
 }

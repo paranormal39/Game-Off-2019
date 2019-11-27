@@ -8,7 +8,7 @@ public class GM : MonoBehaviour
     public GameObject player;
 
     UnityEvent playerdeath;
-    
+    public float health;
     public enum State
     {
         Menu,Playing,GameOver,Loading
@@ -33,10 +33,10 @@ public class GM : MonoBehaviour
     void Update()
     {
         player = GameObject.FindWithTag("Player");
-        PlayerHealth playerHealth = new PlayerHealth();
-        var health = playerHealth.health;
+        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+        
 
-        if (health <= 0  && playerdeath != null)
+        if (playerHealth.health <= 0  && playerdeath != null)
         {
             playerdeath.Invoke();
         }
