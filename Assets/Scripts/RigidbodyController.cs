@@ -30,10 +30,10 @@ public class RigidbodyController : MonoBehaviour
     public float horzmotion;
 
     public AudioClip[] folley;
-    public AudioClip footstep;
+    public AudioClip footstep, airSfx;
     public AudioSource ac;
 
-    public int setHighPoint;
+    public float setHighPoint;
     public bool passedHighPoint;
     // Start is called before the first frame update
     void Start()
@@ -71,8 +71,6 @@ public class RigidbodyController : MonoBehaviour
             canJump = true;
         } 
 
-        
-
         if (Timer <= .01f)
         {
             StartCoroutine(adjustrefill());
@@ -85,7 +83,7 @@ public class RigidbodyController : MonoBehaviour
 
         Vector3 movement = new Vector3(0, 0, moveVer) * speed * Time.deltaTime;
 
-
+        
         Vector3 down = new Vector3(0, -1);
         Vector3 highpoint = new Vector3(0, setHighPoint, 0);
         RaycastHit ground;
@@ -101,6 +99,7 @@ public class RigidbodyController : MonoBehaviour
         if (Physics.Raycast(transform.position, down, out ground, groundcheckrange))
         {
             grounded = true;
+            setHighPoint = 20 + transform.position.y;
             if (Input.GetKey(KeyCode.Space) && grounded == true)
             {
                 jump();
@@ -111,7 +110,10 @@ public class RigidbodyController : MonoBehaviour
         else {
 
             grounded = false; 
-
+            if(Input.GetKey(KeyCode.Space) && grounded == false)
+            {
+                airRelease();
+            }
             if(transform.position.y >highpoint.y)
             {
                 passedHighPoint = true;
@@ -134,8 +136,7 @@ public class RigidbodyController : MonoBehaviour
         //rigidbody.AddForce(movement * thrust
         //transform.Rotate(0f, moveHor, 0f);
         transform.Translate(movement, Space.Self);
-
-    }
+     }
 
     void FixedUpdate()
     {
@@ -147,10 +148,6 @@ public class RigidbodyController : MonoBehaviour
         float lookVer = Input.GetAxis("Mouse Y");
 
         Vector2 screenlook = new Vector2(0, lookHor) * speed /2;
-
-        
-
-        
 
         transform.Rotate(screenlook);
         /*
@@ -183,12 +180,8 @@ public class RigidbodyController : MonoBehaviour
                 //ac.Stop();
                StopCoroutine(foleysfx());
             }
-
-
-
+            
         }
-
-       
 
         if (Input.GetButtonDown("Fire2"))
         {
@@ -204,7 +197,7 @@ public class RigidbodyController : MonoBehaviour
         }
     }
     void jump() {
-        airpressure -= .009f;
+        
         Vector3 jumpforce = new Vector3(0, jumpmag, 0) * speed;
         rigidbody.AddForce(jumpforce);
     }
@@ -214,6 +207,13 @@ public class RigidbodyController : MonoBehaviour
         yield return new WaitForSeconds(2f);
         airpressure += .1f;
 
+    }
+    void airRelease()
+    {
+        airpressure -= .009f;
+        Vector3 Pressureforce = new Vector3(0, jumpmag, 0) * speed;
+        ac.PlayOneShot(airSfx);
+        rigidbody.AddForce(Pressureforce);
     }
 
     private IEnumerator adjustrefill()
