@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-//using UnityEngine.CoreModule;
+using UnityEngine.Events;
+
+
 public class RigidbodyController : MonoBehaviour
 {
     Rigidbody rigidbody;
@@ -11,7 +13,8 @@ public class RigidbodyController : MonoBehaviour
     public float thrust;
     public float jumpmag;
     public float airpressure;
-    //public Slider slider;
+    [SerializeField]
+    private Slider slider;
     private float Timer = 3f;
     public bool canJump;
 
@@ -35,6 +38,13 @@ public class RigidbodyController : MonoBehaviour
 
     public float setHighPoint;
     public bool passedHighPoint;
+
+    public Slider maxheight;
+
+    public GameObject airfx;
+    public float distance;
+
+    public UnityEvent blown;
     // Start is called before the first frame update
     void Start()
     {
@@ -43,14 +53,20 @@ public class RigidbodyController : MonoBehaviour
         canJump = true;
         anim = GetComponent<Animator>();
         groundcheckrange = 1f;
-        //Cursor.visble = false;
-        //Cursor.lockstate = true;
+
+        if(blown == null)
+        {
+            blown = new UnityEvent();
+        }
+    
     }
 
     // Update is called once per frame
     void Update()
     {
-       // slider.value = airpressure;
+
+        
+        slider.value = airpressure;
         Timer -= Time.deltaTime;
         velocity = rigidbody.velocity.y;
         motion = Input.GetAxis("Vertical");
@@ -86,11 +102,16 @@ public class RigidbodyController : MonoBehaviour
         
         Vector3 down = new Vector3(0, -1);
         Vector3 highpoint = new Vector3(0, setHighPoint, 0);
+         distance = highpoint.y - transform.position.y;
+       // maxheight.minValue = transform.position.y;
+       // maxheight.maxValue = setHighPoint;
+        maxheight.value = distance;
         RaycastHit ground;
-        if(transform.position.y > highpoint.y)
+        if(transform.position.y > highpoint.y && passedHighPoint ==true)
         {
-            passedHighPoint = true;
+            //passedHighPoint = true;
             blownaway();
+            blown.Invoke();
         }
         else
         {
@@ -99,10 +120,12 @@ public class RigidbodyController : MonoBehaviour
         if (Physics.Raycast(transform.position, down, out ground, groundcheckrange))
         {
             grounded = true;
+            airfx.SetActive(false);
             setHighPoint = 20 + transform.position.y;
             if (Input.GetKey(KeyCode.Space) && grounded == true)
             {
                 jump();
+                
                 
             }
 
@@ -112,6 +135,7 @@ public class RigidbodyController : MonoBehaviour
             grounded = false; 
             if(Input.GetKey(KeyCode.Space) && grounded == false)
             {
+                airfx.SetActive(true);
                 airRelease();
             }
             if(transform.position.y >highpoint.y)
@@ -120,21 +144,8 @@ public class RigidbodyController : MonoBehaviour
             }
         }
 
-        /*
-        Vector3 targetdir = movement;
-        
-        targetdir.y = 0;
-        if (targetdir == Vector3.zero)
-        {
-            targetdir = transform.forward;
-            Quaternion tr = Quaternion.LookRotation(targetdir);
-            Quaternion targetRotation = Quaternion.Slerp(transform.rotation, tr, 0f);
-            transform.rotation = targetRotation;
-        }
-        */
-        //rigidbody.velocity = movement *speed;
-        //rigidbody.AddForce(movement * thrust
-        //transform.Rotate(0f, moveHor, 0f);
+       
+        transform.Rotate(0f, moveHor *speed *Time.deltaTime, 0f);
         transform.Translate(movement, Space.Self);
      }
 
@@ -150,24 +161,7 @@ public class RigidbodyController : MonoBehaviour
         Vector2 screenlook = new Vector2(0, lookHor) * speed /2;
 
         transform.Rotate(screenlook);
-        /*
-        Vector3 movement = new Vector3(moveHor, 0.0f, moveVer) * speed * Time.deltaTime;
-        timerotation = 1000f * Time.deltaTime ;
-        Vector3 targetdir = movement;
-        targetdir.y = 0;
-        if(targetdir == Vector3.zero)
-        {
-            targetdir = transform.forward;
-            Quaternion tr = Quaternion.LookRotation(targetdir);
-            Quaternion targetRotation = Quaternion.Slerp(transform.rotation, tr,.9f);
-            transform.rotation = targetRotation;
-        }
-
-        //rigidbody.velocity = movement *speed;
-        //rigidbody.AddForce(movement * thrust
-        transform.Translate(movement, Space.Self);
-
-    */
+    
         if (moveVer >= 0.1f)
         {
             // play audio foot steps 
@@ -210,6 +204,7 @@ public class RigidbodyController : MonoBehaviour
     }
     void airRelease()
     {
+       
         airpressure -= .009f;
         Vector3 Pressureforce = new Vector3(0, jumpmag, 0) * speed;
         ac.PlayOneShot(airSfx);
@@ -236,13 +231,19 @@ public class RigidbodyController : MonoBehaviour
         ac.clip = footstep;
         if(!ac.isPlaying)ac.Play();
         yield return new WaitForSeconds(1.5f);
-
         
     }
 
     public void blownaway()
     {
-        rigidbody.AddForce(0, 200, 0, ForceMode.Impulse);
+        rigidbody.AddForce(0, 10, 0, ForceMode.Force);
+        passedHighPoint = true;
+
+    }
+
+    public void resetrig()
+    {
+        passedHighPoint = false;
     }
    
 }

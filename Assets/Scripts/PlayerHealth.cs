@@ -24,4 +24,22 @@ public class PlayerHealth : MonoBehaviour
             health -= 40f;
         }
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "MethaneLake")
+        {
+            health -= .5f;
+        }
+    }
+
+    public void respawn()
+    {
+        health = 100f;
+    }
+
+    public void newrespawn()
+    {
+        health -= 200f;
+    }
 }
